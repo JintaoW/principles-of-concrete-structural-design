@@ -1,0 +1,40 @@
+site_name: 混凝土结构设计原理
+site_description: 《混凝土结构设计原理》课程讲义
+theme:
+  name: material
+  language: zh
+  palette:
+    primary: blue grey
+  features:
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - attr_list
+  - md_in_html
+  - tables
+  - admonition
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+extra_css:
+  - stylesheets/extra.css
+plugins:
+  - search:
+      lang: [zh, en]
+nav:
+  - 首页: index.md
+  - 第一章 混凝土结构材料的性能: ch01.md
+  - 第二章 混凝土结构设计方法: ch02.md
+  - 第三章 钢筋混凝土轴心受力构件正截面承载力计算: ch03.md
+  - 第四章 钢筋混凝土受弯构件正截面承载力计算: ch04.md
+  - 第五章 钢筋混凝土受弯构件斜截面承载力计算: ch05.md
+  - 第六章 钢筋混凝土受扭构件承载力计算: ch06.md
+  - 第七章 钢筋混凝土偏心受力构件承载力计算: ch07.md
+  - 第八章 钢筋混凝土构件的裂缝、变形和耐久性: ch08.md
+  - 第九章 预应力混凝土构件设计: ch09.md

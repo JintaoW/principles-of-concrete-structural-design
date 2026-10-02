@@ -1,0 +1,6 @@
+site/
+work/
+docx/
+.workbuddy/
+__pycache__/
+*.pyc

@@ -1,0 +1,83 @@
+/* ===== 《混凝土结构设计原理》网页排版规范 =====
+   原则（用户确认）: 正体中文仿宋 + 西文 Times New Roman;
+   各级标题黑体 + 西文 Times New Roman; 字号保持 Material 默认;
+   表格居中、表名居中; 独立公式居中 + 编号贴右; 全文字色黑。 */
+
+/* ---- 字体（仅影响正文区 .md-typeset，不改导航等 UI）---- */
+.md-typeset {
+  font-family: "Times New Roman", "FangSong", "仿宋", "STFangsong", serif;
+}
+.md-typeset h1, .md-typeset h2, .md-typeset h3,
+.md-typeset h4, .md-typeset h5, .md-typeset h6 {
+  font-family: "Times New Roman", "SimHei", "黑体", sans-serif;
+}
+
+/* ---- 行内公式图片与文字基线对齐 ---- */
+.md-typeset p img {
+  vertical-align: middle;
+}
+.md-typeset img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- 正文段落首行缩进 2 字符（中文排版习惯）----
+   仅作用于正文顶层段落; 标题/列表/表格/公式块/题注不受影响 */
+.md-typeset > p {
+  text-indent: 2em;
+}
+
+/* ---- 独立公式段: 公式严格居中, 编号绝对定位贴右（与 Word 版式一致）---- */
+.eq {
+  position: relative;
+  text-align: center;
+  margin: 0.9em 0;
+  text-indent: 0;
+}
+.eq img {
+  vertical-align: middle;
+  margin: 0 0.35em;   /* 同段多个公式图之间留缝 */
+}
+.eq-no {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+/* ---- 表格: 整体居中 ----
+   Material 的表格盒(display:table + width:100% 等)使 margin:auto /
+   text-align 等常规居中在 Chrome 上不可靠。
+   最终方案: layout.py 后处理将每个表格包进 .tbl-wrap, 用 flex 居中,
+   机制与表格盒模型完全解耦, 100% 可靠; 单元格内部对齐不受影响。 */
+.tbl-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 1em 0;
+}
+/* flex item(scrollwrap)收缩为内容宽; 宽表超出行宽时恢复可滚动 */
+.tbl-wrap > .md-typeset__scrollwrap {
+  max-width: 100%;
+}
+
+/* ---- 表名题注: 居中、黑体（由 tools/layout.py 自动标记）---- */
+.tbl-caption {
+  text-indent: 0;
+  text-align: center;
+  font-family: "Times New Roman", "SimHei", "黑体", sans-serif;
+  margin: 1.2em 0 0.4em;
+}
+
+/* ---- 插图段与图注（批量转换阶段使用）---- */
+.fig {
+  text-indent: 0;
+  text-align: center;
+  margin: 1em 0;
+}
+.fig-caption {
+  text-indent: 0;
+  text-align: center;
+  font-family: "Times New Roman", "SimHei", "黑体", sans-serif;
+  margin: 0.3em 0 1em;
+}

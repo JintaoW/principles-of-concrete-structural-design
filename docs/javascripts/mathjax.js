@@ -18,7 +18,8 @@
     },
     options: {
       ignoreHtmlClass: ".*",
-      processHtmlClass: "arithmatex"
+      // 正则语义, 必须用|分隔(空格分隔会失配)
+      processHtmlClass: "arithmatex|tex2jax-process"
     }
   };
 })();

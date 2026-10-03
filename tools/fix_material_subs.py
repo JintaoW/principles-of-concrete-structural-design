@@ -7,7 +7,7 @@ r"""材料/受力类下标正体化（用户指定铁律补丁）：
 """
 import glob, re
 
-TARGETS = 'csty'
+TARGETS = 'cstybfw'
 
 def fix_math(content):
     n = 0
@@ -35,7 +35,7 @@ def fix_text(content):
         n += 1
         return '*' + m.group(1) + '*<sub>' + m.group(2) + '</sub>'
     content = re.sub(
-        r'\*([A-Za-z]+(?:<sup>[^<]*</sup>)?)<sub>([' + TARGETS + r'])</sub>\*',
+        r'\*([^*<]+?)<sub>([' + TARGETS + r']) ?</sub>\*',
         outer, content)
     return content, n
 

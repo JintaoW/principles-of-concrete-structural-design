@@ -111,23 +111,48 @@ def main(ch: str):
         doc = word.ActiveDocument
         n = doc.InlineShapes.Count
         print(f'Word InlineShapes: {n}')
+        # 先按 ProgID 过滤出 OLE 形状序列; AxGlyph 等非行内 OLE 不占 InlineShapes,
+        # 故只对 AxMath/DSMT 的 <w:object> 做对齐
+        ole_seq = []  # [(shape_idx, progid)]
+        for i in range(1, n + 1):
+            sh = doc.InlineShapes(i)
+            try:
+                pid = sh.OLEFormat.ProgID
+            except Exception:
+                continue
+            if pid:
+                ole_seq.append((i, pid))
+        expected = [o for o in oles if 'AxMath' in o[1] or 'DSMT' in o[1]]
+        print(f'Word 中 OLE 形状: {len(ole_seq)} 个, xml 中 AxMath/DSMT: {len(expected)} 个')
+        if len(ole_seq) != len(expected) or any(
+                w[1] != x[1] for w, x in zip(ole_seq, expected)):
+            print('!! OLE 数量/顺序不一致, 中止')
+            print('  word:', ole_seq[:5])
+            print('  xml :', [(o[0], o[1]) for o in expected[:5]])
+            doc.Close(False)
+            return
         t_start = time.time()
-        for i, (ole_idx, pid, media) in enumerate(oles, 1):
+        for ole in oles:
+            ole_idx, pid, media = ole
             if 'AxMath' not in pid:
                 results.append([ole_idx, pid, media, None])
                 continue
-            sh = doc.InlineShapes(i)
-            try:
-                real_pid = sh.OLEFormat.ProgID
-            except Exception:
-                real_pid = pid
+            k = expected.index(ole)  # 位置在 expected/ole_seq 中一致
+            shape_idx = ole_seq[k][0]
+            sh = doc.InlineShapes(shape_idx)
+            real_pid = sh.OLEFormat.ProgID
             if 'AxMath' not in (real_pid or ''):
                 results.append([ole_idx, real_pid, media, None])
                 print(f'  #{ole_idx}: ProgID 不匹配({real_pid}), 跳过')
                 continue
             setflag('WaitingConvert', '0')
             t0 = time.time()
-            sh.OLEFormat.DoVerb(10)
+            try:
+                sh.OLEFormat.DoVerb(10)
+            except Exception as e:
+                results.append([ole_idx, real_pid, media, None])
+                print(f'  #{ole_idx} ({media}): DoVerb 失败: {e}')
+                continue
             while getflag('WaitingConvert') != '1' and time.time() - t0 < 10:
                 time.sleep(0.05)
             time.sleep(0.05)

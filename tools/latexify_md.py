@@ -15,17 +15,55 @@ ROOT = Path(__file__).resolve().parent.parent
 ch = sys.argv[1] if len(sys.argv) > 1 else 'ch02'
 
 data = json.loads((ROOT / 'work' / 'extract' / f'{ch}_latex.json').read_text(encoding='utf-8'))
+# 合并 MathType 提取结果(若有)
+mt_path = ROOT / 'work' / 'extract' / f'{ch}_mt_latex.json'
+if mt_path.exists():
+    mt = json.loads(mt_path.read_text(encoding='utf-8'))
+    data = {'chapter': ch, 'oles': data['oles'] + mt['oles']}
+    print(f'合并 MathType 结果: {sum(1 for o in mt["oles"] if o[3])} 个')
 body = {}  # imageN.png -> latex body
+from collections import Counter
+
+
+
+
+groups = {}  # name -> [latex...] 多数票
 for idx, pid, media, latex in data['oles']:
     if not latex:
         continue
-    name = media.rsplit('.', 1)[0] + '.png'
-    s = latex.strip()
+    raw = latex.strip()
+    # sanity 检查原始形式: AxMath 输出 $...$, MathType 输出 \(...\)/\[...\]
+    if not (raw.startswith('$') or raw.startswith('\\(') or raw.startswith('\\[')):
+        print(f'过滤异常LaTeX: {media} <- {raw[:50]!r} (保留图片)')
+        continue
+    stem = media.rsplit('.', 1)[0]
+    name = stem + '.png'
+    if not (ROOT / 'docs' / 'images' / ch / name).exists():
+        name = 'v' + stem + '.png'  # 多数章公式图带 v 前缀
+    s = raw
     if s.startswith('$') and s.endswith('$'):
         s = s[1:-1].strip()
-    if name in body and body[name] != s:
-        print(f'警告: {name} LaTeX不一致')
-    body[name] = s
+    if s.startswith('\\(') and s.endswith('\\)'):
+        s = s[2:-2].strip()
+    if s.startswith('\\[') and s.endswith('\\]'):
+        s = s[2:-2].strip()
+    if not s:
+        print(f'过滤空翻译: {media} (保留图片)')
+        continue
+    groups.setdefault(name, []).append(s)
+
+# MathJax 兼容性修正
+for k in body:
+    body[k] = re.sub(r"\^(['‘’]+)", r"^{\1}", body[k])
+    body[k] = body[k].replace(r"\kern-\nulldelimiterspace", r"\kern-1.2pt")
+
+for name, lats in groups.items():
+    if len(set(lats)) > 1:
+        top = Counter(lats).most_common(1)[0]
+        print(f'警告: {name} LaTeX不一致({len(lats)}个), 取多数票({top[1]}票)')
+        body[name] = top[0]
+    else:
+        body[name] = lats[0]
 
 md_path = ROOT / 'docs' / f'{ch}.md'
 text = md_path.read_text(encoding='utf-8')

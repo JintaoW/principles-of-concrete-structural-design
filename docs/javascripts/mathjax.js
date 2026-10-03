@@ -24,7 +24,8 @@
       ignoreHtmlClass: ".*",
       // 正则语义, 必须用|分隔(空格分隔会失配)
       // arithmatex: 构建期转换的公式; tex2jax-process: 原生HTML表格单元格(md_in_html不处理td内容)
-      processHtmlClass: "arithmatex|tex2jax-process"
+      // md-ellipsis: 目录/导航条目——toc扩展生成目录时剥掉span只留字面\(...\), 需浏览器端补排
+      processHtmlClass: "arithmatex|tex2jax-process|md-ellipsis"
     }
   };
 })();
@@ -49,7 +50,7 @@ document$.subscribe(function () {
   whenMathJaxReady(function () {
 
   function pending() {
-    return Array.from(document.querySelectorAll(".arithmatex, .tex2jax-process"))
+    return Array.from(document.querySelectorAll(".arithmatex, .tex2jax-process, .md-ellipsis"))
       .filter(function (el) { return !el.dataset.mjxDone; });
   }
 

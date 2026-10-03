@@ -23,8 +23,7 @@ const { chromium } = require('playwright-core');
       while (walk.nextNode()) {
         const t = walk.currentNode.textContent;
         if (t.includes('\\') && new RegExp(pat).test(t) &&
-            !walk.currentNode.parentElement.closest('mjx-container') &&
-            !walk.currentNode.parentElement.closest('.md-ellipsis')) // 目录栏不算
+            !walk.currentNode.parentElement.closest('mjx-container'))
           out.raws.push(t.trim().slice(0, 90));
       }
       document.querySelectorAll('mjx-merror').forEach(() => out.merror++);

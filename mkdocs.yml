@@ -27,6 +27,8 @@ extra_css:
 plugins:
   - search:
       lang: [zh, en]
+hooks:
+  - tools/img_path_hook.py
 nav:
   - 首页: index.md
   - 第一章 混凝土结构材料的性能: ch01.md

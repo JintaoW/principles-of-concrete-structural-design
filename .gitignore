@@ -4,3 +4,4 @@ docx/
 .workbuddy/
 __pycache__/
 *.pyc
+tools/diag_*

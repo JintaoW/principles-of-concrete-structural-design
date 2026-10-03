@@ -8,7 +8,15 @@ const { chromium } = require('playwright-core');
   for (const ch of chapters) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
     await page.goto(`http://localhost:8000/${ch === 'index' ? '' : ch + '/'}`, { waitUntil: 'load', timeout: 60000 });
-    await page.waitForTimeout(7000);
+    await page.waitForTimeout(3000);
+    // 懒渲染适配: 扫描前强制全量排版(等待MathJax就绪后清空懒渲染标记并全量排)
+    await page.evaluate(async () => {
+      const ready = window.MathJax && MathJax.startup && MathJax.startup.promise
+        ? await MathJax.startup.promise
+        : null;
+      document.querySelectorAll('[data-mjx-done]').forEach(el => { delete el.dataset.mjxDone; });
+      if (window.MathJax && MathJax.typesetPromise) await MathJax.typesetPromise();
+    });
     const res = await page.evaluate((pat) => {
       const out = { raws: [], merror: 0, empty: 0, longEqs: [] };
       const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
